@@ -6,6 +6,10 @@
 #
 # Services attendus :
 #
+#   mongo    → image officielle mongo:7
+#              port 27017 exposé
+#              volume persistant pour les données
+#
 #   backend  → build depuis ./backend
 #              port 8000 exposé
 #              variables d'environnement : MONGO_URL, SECRET_KEY
@@ -15,13 +19,14 @@
 #              port 80 exposé
 #              dépend de : backend
 #
-#   mongo    → image officielle mongo:7
-#              port 27017 exposé
-#              volume persistant pour les données
+#   Indice : 
+#     vous aurez besoin d'un volume pour Mongo, mais pas pour les autres services.
+#     vous aurez aussi besoin de la directive "depends_on" pour gérer l'ordre de démarrage des services.
 #
 # Rappel : les variables sensibles (SECRET_KEY) ne doivent pas être
 # écrites en dur ici — utilisez un fichier .env (voir .env.example)
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 services:
   # À compléter...
