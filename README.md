@@ -5,6 +5,7 @@
 Test pipeline
 Test pipeline 1
 Test pipeLune 2
+Test Pipeline deploiemment vps 1
 # devops-b3
 
 Projet support pour le cours DevOps — Bachelor B3.
