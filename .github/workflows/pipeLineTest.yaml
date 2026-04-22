@@ -107,7 +107,7 @@ jobs:
       - name: Send ntfy notification
         env:
           NTFY_SERVER: ${{ secrets.NTFY_SERVER }}
-          DEVOPS_COURSDYLAN: ${{ secrets.DEVOPS_COURSDYLAN }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC_X9K7Q2M4R8V1 }}
           BACKEND_RESULT: ${{ needs.backend-tests.result }}
           FRONTEND_RESULT: ${{ needs.frontend-tests-build.result }}
           DOCKER_RESULT: ${{ needs.docker-build-push.result }}
@@ -135,7 +135,7 @@ jobs:
 
           MESSAGE="[$STATUS] $REPO on $BRANCH%0ABackend: $BACKEND_RESULT%0AFrontend: $FRONTEND_RESULT%0ADocker: $DOCKER_RESULT%0A$RUN_URL"
 
-          curl -sS -X POST "$NTFY_SERVER/$DEVOPS_COURSDYLAN" \
+          curl -sS -X POST "$NTFY_SERVER/$NTFY_TOPIC" \
             -H "Title: $TITLE" \
             -H "Priority: $PRIORITY" \
             -H "Tags: github,ci" \
