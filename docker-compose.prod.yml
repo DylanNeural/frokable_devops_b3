@@ -9,7 +9,7 @@ services:
     image: ${DOCKERHUB_USERNAME}/devops-b3-backend:latest
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "8001:8000"
     environment:
       MONGO_URL: mongodb://mongo:27017/mydatabase
       SECRET_KEY: ${SECRET_KEY}

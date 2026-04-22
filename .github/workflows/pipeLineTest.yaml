@@ -104,7 +104,7 @@ jobs:
           context: ./frontend
           push: true
           build-args: |
-            VITE_API_URL=http://${{ secrets.VPS_HOST }}:8000
+            VITE_API_URL=http://${{ secrets.VPS_HOST }}:8001
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/devops-b3-frontend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/devops-b3-frontend:${{ github.sha }}
