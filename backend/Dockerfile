@@ -16,13 +16,21 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-FROM python:3.12-slim
-WORKDIR /backend
-ENV Node_ENV=production
-ARG VERSION=0.1.0
-COPY requirements.txt .
+FROM python:3.12-slim AS builder
+WORKDIR /app
+
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
-EXPOSE 8000
+
+FROM python:3.12-slim AS runner
+WORKDIR /app
+
+ENV PATH="/opt/venv/bin:$PATH"
+COPY --from=builder /opt/venv /opt/venv
 COPY . .
-USER  nobody
-CMD ["uvicorn main:app", "--host 0.0.0.0", "--port 8000"]
+
+EXPOSE 8000
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
