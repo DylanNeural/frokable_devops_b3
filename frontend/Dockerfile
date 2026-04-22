@@ -14,3 +14,15 @@
 # Pourquoi multi-stage ? L'image finale ne doit pas contenir Node ni
 # node_modules — juste les fichiers statiques servis par Nginx.
 # ─────────────────────────────────────────────────────────────────────────────
+
+FROM baseImage
+WORKDIR /frontend
+ENV Node_ENV=production
+ARG VERSION=0.1.0
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+FROM nginx:alpine
+COPY --from=0 /frontend/dist/ /usr/share/nginx/html
+EXPOSE 8080
