@@ -3,11 +3,11 @@ name: CI Pipeline
 on:
   push:
     branches:
-      - main
+      - dylan
       - master
   pull_request:
     branches:
-      - main
+      - dylan
       - master
 
 jobs:
