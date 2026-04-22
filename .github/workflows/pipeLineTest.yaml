@@ -124,6 +124,8 @@ jobs:
           script: |
             set -e
             cd /opt/devops-b3
+            git fetch origin
+            git reset --hard origin/master
             cat > .env <<'EOF'
             DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
             SECRET_KEY=${{ secrets.SECRET_KEY }}
