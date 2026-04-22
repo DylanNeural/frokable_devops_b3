@@ -20,7 +20,7 @@ services:
     image: ${DOCKERHUB_USERNAME}/devops-b3-frontend:latest
     restart: unless-stopped
     ports:
-      - "80:8080"
+      - "8080:8080"
     depends_on:
       - backend
 
