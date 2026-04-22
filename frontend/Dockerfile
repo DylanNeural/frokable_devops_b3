@@ -15,12 +15,13 @@
 # node_modules — juste les fichiers statiques servis par Nginx.
 # ─────────────────────────────────────────────────────────────────────────────
 
-FROM baseImage
+FROM node:20-alpine
 WORKDIR /frontend
 ENV Node_ENV=production
 ARG VERSION=0.1.0
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm run build
+RUN npm ci 
 COPY . .
 RUN npm run build
 FROM nginx:alpine
