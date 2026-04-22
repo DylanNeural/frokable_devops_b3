@@ -103,9 +103,34 @@ jobs:
         with:
           context: ./frontend
           push: true
+          build-args: |
+            VITE_API_URL=http://${{ secrets.VPS_HOST }}:8000
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/devops-b3-frontend:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/devops-b3-frontend:${{ github.sha }}
+
+  deploy-vps:
+    runs-on: ubuntu-24.04
+    needs:
+      - docker-build-push
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master' && needs.docker-build-push.result == 'success'
+    steps:
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            set -e
+            cd /opt/devops-b3
+            cat > .env <<'EOF'
+            DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+            SECRET_KEY=${{ secrets.SECRET_KEY }}
+            EOF
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
   notify-ntfy:
     runs-on: ubuntu-24.04
@@ -113,6 +138,7 @@ jobs:
       - backend-tests
       - frontend-tests-build
       - docker-build-push
+      - deploy-vps
     if: always()
     steps:
       - name: Send ntfy notification
@@ -122,6 +148,7 @@ jobs:
           BACKEND_RESULT: ${{ needs.backend-tests.result }}
           FRONTEND_RESULT: ${{ needs.frontend-tests-build.result }}
           DOCKER_RESULT: ${{ needs.docker-build-push.result }}
+          DEPLOY_RESULT: ${{ needs.deploy-vps.result }}
           REPO: ${{ github.repository }}
           BRANCH: ${{ github.ref_name }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -144,7 +171,13 @@ jobs:
             PRIORITY="high"
           fi
 
-          MESSAGE="[$STATUS] $REPO on $BRANCH%0ABackend: $BACKEND_RESULT%0AFrontend: $FRONTEND_RESULT%0ADocker: $DOCKER_RESULT%0A$RUN_URL"
+          if [ "$DEPLOY_RESULT" != "success" ] && [ "$DEPLOY_RESULT" != "skipped" ]; then
+            STATUS="FAILED"
+            TITLE="CI FAILED"
+            PRIORITY="high"
+          fi
+
+          MESSAGE="[$STATUS] $REPO on $BRANCH%0ABackend: $BACKEND_RESULT%0AFrontend: $FRONTEND_RESULT%0ADocker: $DOCKER_RESULT%0ADeploy: $DEPLOY_RESULT%0A$RUN_URL"
 
           curl -sS -X POST "$NTFY_SERVER/$NTFY_TOPIC" \
             -H "Title: $TITLE" \
