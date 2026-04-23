@@ -126,7 +126,7 @@ export default function App() {
 
   return (
     <div className="container">
-      <h1>DevOps B3</h1>
+      <h1>DevOps B3 Modif</h1>
       <div className="tabs">
         <button
           className={mode === 'login' ? 'active' : ''}

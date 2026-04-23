@@ -1,43 +1,42 @@
-# Stack de production: base de donnees, API backend, frontend statique.
+# Stack de production: base de donnees, API backend, frontend statique
 services:
-  # MongoDB: base de donnees persistante.
+  # MongoDB: base de donnees persistante
   mongo:
     image: mongo:7
-    # Redemarre automatiquement sauf arret manuel explicite.
+    # Redemarre automatiquement sauf arret manuel explicite
     restart: unless-stopped
-    # Volume nomme pour conserver les donnees entre redemarrages.
+    # Volume nomme pour conserver les donnees entre redemarrages
     volumes:
       - mongo_data:/data/db
 
-  # API FastAPI pre-build sur Docker Hub.
+  # API FastAPI pre-build sur Docker Hub
   backend:
-    # Le username est injecte via .env sur le VPS.
+    # Le username est injecte via env sur le VPS
     image: ${DOCKERHUB_USERNAME}/devops-b3-backend:latest
     restart: unless-stopped
-    # Port host:container -> API accessible sur le VPS via :8001.
+    # Port host:container -> API accessible sur le VPS via :8001 
     ports:
       - "8001:8000"
-    # Variables runtime necessaires a l'application.
+    # Variables runtime necessaires a l'application
     environment:
-      # Connexion Mongo via le nom de service Docker interne.
+      # Connexion Mongo via le nom de service Docker interne
       MONGO_URL: mongodb://mongo:27017/mydatabase
-      # Cle de signature JWT injectee depuis .env.
       SECRET_KEY: ${SECRET_KEY}
-    # Demarre mongo avant le backend.
+    # Demarre mongo avant le backend
     depends_on:
       - mongo
 
-  # Frontend React build et servi par Nginx.
+  # Frontend React build et servi par Nginx
   frontend:
     image: ${DOCKERHUB_USERNAME}/devops-b3-frontend:latest
     restart: unless-stopped
-    # Port host:container -> frontend accessible sur le VPS via :8080.
+    # Port host:container -> frontend accessible sur le VPS via :8080
     ports:
       - "8080:8080"
-    # Demarre backend avant le frontend.
+    # Demarre backend avant le frontend
     depends_on:
       - backend
 
-# Declaration des volumes persistants utilises par les services.
+# Declaration des volumes persistants utilises par les services
 volumes:
   mongo_data:
