@@ -1,0 +1,16 @@
+name: La Pipeline de Natanael
+
+on:
+  push:
+    branches:
+      - natanael
+
+jobs:
+  test-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v3
+
+      - name: Simple test
+        run: echo "La pipeline fonctionne !"
